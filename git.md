@@ -2,6 +2,7 @@
 
 25) ******** git
 
+```shell
 sudo apt-get install git-all
 git config --global user.name "Van Dravik"
 git config --global user.email jan@vandravik.com
@@ -41,3 +42,4 @@ vi .gitconfig
 //
 helper = cache --timeout 30000
 //
+```
