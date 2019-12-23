@@ -1,6 +1,6 @@
 **GIT**
 
-25) ******** git [reference url git](https://git-scm.com/book/fr/v2/Utilitaires-Git-Stockage-des-identifiants#s_credential_caching "git")
+******** git [reference url git](https://git-scm.com/book/fr/v2/Utilitaires-Git-Stockage-des-identifiants#s_credential_caching "git")
 
 ```shell
 sudo apt-get install git-all
