@@ -42,4 +42,14 @@ vi .gitconfig
 //
 helper = cache --timeout 30000
 //
+
+// plusieurs repos
+git remote add nextcloud https://github.com/janvandan/nextcloud.git
+git remote add memos https://github.com/janvandan/memos.git
+
+git remote rm nextcloud
+
+git remote
+
+
 ```
