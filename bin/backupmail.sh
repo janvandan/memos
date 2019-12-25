@@ -3,8 +3,10 @@
 # server backup postfix & co
 
 # init
-Log=1
+Log=0
 Debug=0
+
+shellName=$0
 
 ListeConfFile="\
  /etc/postfixadmin/dbconfig.inc.php\
@@ -44,7 +46,57 @@ ListeConfFile="\
  /etc/init.d/firewall.sh\
 "
 
-[[ $Log > 0 ]] && printf "[Log($Log)] Demarrage\n" >&2
+function servicesMail
+{
+	option=$1
+
+	[[ $Log > 0 ]] && printf "[$shellName Log($Log) (function $0)  option = $option\n" >&2
+
+	if [[ $Debug > 0 ]]
+	then
+		printf "[$shellName Debug($Debug)] sudo service postfix $option >&2\n"
+#		printf "[$shellName Debug($Debug)] sudo service sendmail $option >&2\n"
+		printf "[$shellName Debug($Debug)] sudo service spamassassin $option >&2\n"
+		printf "[$shellName Debug($Debug)] sudo service clamav-daemon $option >&2\n"
+		printf "[$shellName Debug($Debug)] sudo service amavis $option >&2\n"
+		printf "[$shellName Debug($Debug)] sudo service dovecot $option >&2\n"
+	else
+		sudo service postfix $option >&2
+#		sudo service sendmail $option >&2
+		sudo service spamassassin $option >&2
+		sudo service clamav-daemon $option >&2
+		sudo service amavis $option >&2
+		sudo service dovecot $option >&2
+	fi
+	if [[ $option = "start" ]]
+	then
+		if [[ $Debug > 0 ]]
+		then
+			printf "[$shellName Debug($Debug)] sudo a2enconf roundcube >&2\n"
+			printf "[$shellName Debug($Debug)] sudo a2enconf postfixadmin >&2\n"
+		else
+			sudo a2enconf roundcube >&2
+			sudo a2enconf postfixadmin >&2
+		fi
+	else
+		if [[ $Debug > 0 ]]
+		then
+			printf "[$shellName Debug($Debug)] sudo a2disconf roundcube >&2\n"
+			printf "[$shellName Debug($Debug)] sudo a2disconf postfixadmin >&2\n"
+		else
+			sudo a2disconf roundcube >&2
+			sudo a2disconf postfixadmin >&2
+		fi
+	fi
+	if [[ $Debug > 0 ]]
+	then
+		printf "[$shellName Debug($Debug)] sudo systemctl reload apache2 >&2\n"
+	else
+		sudo systemctl reload apache2 >&2
+	fi
+}
+
+[[ $Log > 0 ]] && printf "[$shellName Log($Log)] Demarrage\n" >&2
 
 RSYNCSRC='/home/mail'
 RSYNCDEST='/home/backup-mail'
@@ -54,37 +106,43 @@ then
 	echo $RSYNCDEST n\'existe pas ! >&2
 	if [ $Debug > 0 ]
 	then
-		printf "[Debug($Debug)] sudo mkdir $RSYNCDEST\n" >&2
+		printf "[$shellName Debug($Debug)] sudo mkdir $RSYNCDEST\n" >&2
 		sudo mkdir $RSYNCDEST
 	fi
 else
-	[[ $Log > 0 ]] && printf "[Log($Log)] $RSYNCDEST existe\n" >&2
+	[[ $Log > 0 ]] && printf "[$shellName Log($Log)] $RSYNCDEST existe\n" >&2
 fi
 
 #BackupDate=`date +"%Y%m%d"`
 BackupDate=`date +"%Y%m"`
 RSYNCDEST=$RSYNCDEST/mail-dirbkp_$BackupDate
 
-[[ $Log > 0 ]] && printf "[Log($Log)] RSYNCDEST=$RSYNCDEST\n" >&2
+[[ $Log > 0 ]] && printf "[$shellName Log($Log)] RSYNCDEST=$RSYNCDEST\n" >&2
+
+# arrêt des services
+servicesMail stop
 
 # copy the full mail path
 if [[ $Debug > 0 ]]
 then
-	printf "[Debug($Debug)] sudo sh -c \"rsync -Aavx $ListeConfFile $RSYNCSRC/ $RSYNCDEST/ > $RSYNCDEST.lst\"\n" >&2
+	printf "[$shellName Debug($Debug)] sudo sh -c \"rsync -Aavx $ListeConfFile $RSYNCSRC/ $RSYNCDEST/ >> $RSYNCDEST.lst\"\n" >&2
 else
-	sudo sh -c "rsync -Aavx $ListeConfFile $RSYNCSRC/ $RSYNCDEST/ > $RSYNCDEST.lst"
+	sudo sh -c "rsync -Aavx $ListeConfFile $RSYNCSRC/ $RSYNCDEST/ >> $RSYNCDEST.lst"
 fi
 
 # dump bdd
 
 if [[ $Debug > 0 ]]
 then
-	printf "[Debug($Debug)] sudo sh -c \"mysqldump --single-transaction -u root postfixadmin > $RSYNCDEST.postfixadmin.bak\"\n" >&2
-	printf "[Debug($Debug)] sudo sh -c \"mysqldump --single-transaction -u root roundcube > $RSYNCDEST.roundcube.bak\"\n" >&2
+	printf "[$shellName Debug($Debug)] sudo sh -c \"mysqldump --single-transaction -u root postfixadmin > $RSYNCDEST.postfixadmin.bak\"\n" >&2
+	printf "[$shellName Debug($Debug)] sudo sh -c \"mysqldump --single-transaction -u root roundcube > $RSYNCDEST.roundcube.bak\"\n" >&2
 else
 	sudo sh -c "mysqldump --single-transaction -u root postfixadmin > $RSYNCDEST.postfixadmin.bak"
 	sudo sh -c "mysqldump --single-transaction -u root roundcube > $RSYNCDEST.roundcube.bak"
 fi
+
+# redemarrage des services
+servicesMail start
 
 # restore
 # rsync -Aax nextcloud-dirbkp/ nextcloud/
