@@ -125,9 +125,9 @@ servicesMail stop
 # copy the full mail path
 if [[ $Debug > 0 ]]
 then
-	printf "[$shellName Debug($Debug)] sudo sh -c \"rsync -Aavx $ListeConfFile $RSYNCSRC/ $RSYNCDEST/ >> $RSYNCDEST.lst\"\n" >&2
+	printf "[$shellName Debug($Debug)] sudo sh -c \"rsync --delete -Aavx $ListeConfFile $RSYNCSRC/ $RSYNCDEST/ >> $RSYNCDEST.lst\"\n" >&2
 else
-	sudo sh -c "rsync -Aavx $ListeConfFile $RSYNCSRC/ $RSYNCDEST/ >> $RSYNCDEST.lst"
+	sudo sh -c "rsync -Aavx --delete $ListeConfFile $RSYNCSRC/ $RSYNCDEST/ >> $RSYNCDEST.lst"
 fi
 
 # dump bdd
