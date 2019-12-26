@@ -51,5 +51,10 @@ git remote rm nextcloud
 
 git remote
 
+// suppression
+git rm optimize.sh
+git reset HEAD optimize.sh
+git comm ...
+git push ...
 
 ```
