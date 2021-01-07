@@ -1,4 +1,4 @@
-# commande pour parser xml via xmllint --shell par exemple
+# commande pour parser xml via xpath perl ou xmllint --shell par exemple
 
 # commande xmllint
 cd
