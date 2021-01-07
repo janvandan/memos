@@ -22,3 +22,16 @@ xpath //key[text()='AlbumName']/following::string[1]/text()
 
 xpath /plist/dict/array[1]/dict/key[text()='AlbumName']/following::string[1]/text()
 xpath /plist/dict/array[1]/dict/key[text()='AlbumName']/following::string[1]/text()
+
+# recup des noms des Albums iPhotos
+xmllint --shell AlbumData.xml <<EOF
+cat /plist/dict/array[1]/dict/key[text()='AlbumName']/following::string[1]/text()
+EOF
+
+# struct AlbumData.xml
+# root plist
+#   dict
+#     array[1] / AlbumName
+#     array[2] / RollName
+#     dict[1] / Faces
+#     dict[2] / Faces loc
