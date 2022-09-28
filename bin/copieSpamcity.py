@@ -4,6 +4,8 @@ import urllib
 from random import choice
 from random import randint
 
+# https://github.com/dbertho/spamcity/blob/main/spamcity.py
+
 def proxy_generator():
 	proxy = choice(list(lines))
 	proxy = {"https": proxy}
